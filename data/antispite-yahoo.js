@@ -1,14 +1,3 @@
-// ==UserScript==
-// @id             antispike@tonyq
-// @name           Anti-Spike Plugin
-// @version        0.0.1
-// @namespace      http://antispike.tonyq.org/antispike.user.js
-// @updateURL      http://antispike.tonyq.org/antispike.user.js
-// @downloadURL    http://antispike.tonyq.org/antispike.user.js
-// @description    Antispike extension
-// @match          https://www.facebook.com/plugins/comments.php*
-// @match          http://www.facebook.com/plugins/comments.php*
-// ==/UserScript==
 
 
 function wrapper() {
