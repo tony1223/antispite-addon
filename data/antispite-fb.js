@@ -76,13 +76,13 @@ function wrapper() {
       }
       post.classList.add("handled");
       var report = document.createElement("a");
-      report.innerHTML = "回報跳針";
+      report.textContent = "回報跳針";
       report.style.color='#5b74a8';
       report.setAttribute("data-key",post.id);
       report.classList.add("comment-report");
 
       var link = document.createElement("a");
-      link.innerHTML = "小幫手粉絲頁";
+      link.textContent = "小幫手粉絲頁";
       link.style.color='#5b74a8';
       link.href="https://www.facebook.com/pages/跳針留言小幫手/558883377558652";
       link.target="_blank";
@@ -97,7 +97,7 @@ function wrapper() {
             {
               data:JSON.stringify(analyticsPost(post,url)) //add-on only
             },function(){
-              report.innerHTML = "已回報";
+              report.textContent = "已回報";
               //alert("success");
             });
           },1000);
@@ -106,7 +106,7 @@ function wrapper() {
           {
             data:JSON.stringify(analyticsPost(post,url)) //add-on only
           },function(){
-            report.innerHTML = "已回報";
+            report.textContent = "已回報";
             actions.appendChild(document.createTextNode("· "));
             actions.appendChild(link);          
           });
@@ -210,7 +210,7 @@ function wrapper() {
             pagers[i].click();
           }          
         };
-        openBtn.innerHTML = "展開全部留言(by小幫手)"
+        openBtn.textContent = "展開全部留言(by小幫手)"
         openBtn.classList.add("open-helper");
 
         if (document.querySelector(".uiHeaderTitle") != null){
@@ -258,13 +258,26 @@ function wrapper() {
                   content.style.color ='gray';
                   content.setAttribute("title","跳針內容");
 
-                  var span = document.createElement("p");
-                  span.style.color="red";
-                  span.innerHTML="(反跳針偵測：注意，此篇可能有跳針內容。"+
-                      "<a href='" + SERVER + "/comment/provide/?key="+post._id+"' target='_blank'>提供更多資料</a>)";
+                  var p = document.createElement("p");
+                  p.style.color="red";
+
+                  {
+                    var span1 = document.createElement("span");
+                    span1.textContent = "(反跳針偵測：注意，此篇可能有跳針內容。";
+                    var span2 = document.createElement("span");
+                    span2.textContent = ")";
+                    var a = document.createElement("a");
+                    a.href = SERVER + "comment/provide/?key="+post._id;
+                    a.target="_blank";
+                    a.textContent = "提供更多資料";
+
+                    p.appendChild(span1);
+                    p.appendChild(a);
+                    p.appendChild(span2);
+                  }
 
                   var ele_elem = ele.querySelector(".stat_elem");
-                  ele_elem.parentNode.insertBefore(span,ele_elem);
+                  ele_elem.parentNode.insertBefore(p,ele_elem);
 
                   if(post.reply){
                     var replydiv = document.createElement("div"),
@@ -279,7 +292,7 @@ function wrapper() {
 
 
                     replytitle.style.color="red";
-                    replytitle.innerHTML = "小幫手的網友於 " + replyText + " 提供：" ;
+                    replytitle.textContent = "小幫手的網友於 " + replyText + " 提供：" ;
                     replycontent.textContent = post.reply.content;
                     replydiv.style.padding = "10px";
                     replydiv.style.borderRadius = "5px";
@@ -335,11 +348,11 @@ function wrapper() {
                       anti_link.style.color='red';
                       anti_link.target="_blank";
                       anti_link.classList.add("anti-title");
-                      anti_link.innerHTML = " 使用者跳針指數("+user.count+")";
+                      anti_link.textContent = " 使用者跳針指數("+user.count+")";
                       anti_link.href = SERVER + "comment/user/?key="+encodeURIComponent(user.user);
                       titles.appendChild(anti_link);
                     }else{
-                      titles.querySelector(".anti-title").innerHTML = " 使用者跳針指數("+user.count+")";
+                      titles.querySelector(".anti-title").textContent = " 使用者跳針指數("+user.count+")";
                     }
 
                     var replyText = findReplyComment(ele);
@@ -361,7 +374,7 @@ function wrapper() {
                         btn = document.createElement("a");
                         btn.classList.add("import-btn");
                         btn.href="javascript:void 0;"
-                        btn.innerHTML="引用跳針紀錄(因技術限制需先在留言框先打一個字才能引用)";
+                        btn.textContent="引用跳針紀錄(因技術限制需先在留言框先打一個字才能引用)";
                         btn.onclick = function(e){
                           if(text){
                             text.value += "\n" + this.getAttribute("data-text");
