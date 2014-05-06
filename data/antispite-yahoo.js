@@ -71,7 +71,7 @@ function wrapper() {
       };
     }
 
-    var analyticsPost = function(post,url){
+    var analyticsPost = function(post,url,check){
         var key = post.id;
         try{
           var userDom = post.querySelector(".ugccmt-user-cmt");
@@ -95,7 +95,8 @@ function wrapper() {
             time:time.time,
             key:key,
             url:url,
-            exact:time.exact
+            exact:time.exact,
+            check:check ? "true" : null
           };
         }catch(ex){
           return null;
@@ -111,17 +112,11 @@ function wrapper() {
         return null;
       }
       return p;
-    }
+    };
 
-    var applyoptions = function(post,url){
-      if(post.classList.contains("handled") || post.querySelector(".abuse") == null){
-        return false;
-      }
-      post.classList.add("handled");
-
-     
+    var getPostUrl = function(post,url){
+      var new_url  = url;
       var comments = findFirstParent(post,"ugccmt-comments");
-
       try{
         if(comments.querySelector("#ugccmt-comment_") != null){ //不在原本的新聞裡
           var firstLevelPost = findFirstParent(post,"ugccmt-cmt-item") || post;
@@ -133,13 +128,24 @@ function wrapper() {
             var postArticle = postMeta.querySelector(".ugccmt-article-title a") ;
             if(postArticle){
               var _url = postArticle.href.split(/\?/)[0];
-              url = _url;
+              new_url = _url;
             }
           }
         }
       }catch(ex){
         console.log("get url fail");
       }
+      return new_url;
+    };
+
+    var applyoptions = function(post,url){
+      if(post.classList.contains("handled") || post.querySelector(".abuse") == null){
+        return false;
+      }
+      post.classList.add("handled");
+
+     
+      url = getPostUrl(post,url);
       
 
       // var datetime = new Date(parseInt(post.id.split(/[\-_]/)[2],10));
@@ -262,7 +268,7 @@ function wrapper() {
       if(!document.body.classList.contains("report-comment-handled")){
         document.body.classList.add("report-comment-handled");
         document.onclick=function(e){
-          console.log("event",e);
+          //console.log("event",e);
           try{
             if(e.target.classList.contains("comment-report")){
               var key_id = e.target.getAttribute("data-key");
@@ -396,42 +402,31 @@ function wrapper() {
                       titles.querySelector(".anti-title").textContent = " 使用者跳針指數("+user.count+")";
                     }
 
-                    // var replyText = findReplyComment(ele);
-                    // if(replyText){
-                    //   var related_users = findRelatedUsers(ele);
-                    //   var reply = [];
-                    //   related_users.forEach(function(user){
-                    //     reply.push(users[user].name+" 的跳針指數("+users[user].count+"),看看他的留言清單:",
-                    //         SERVER + "comment/user/?key="+encodeURIComponent(user)
-                    //     );
-                    //   }); 
-                    //   var text = replyText.querySelector("textarea.textInput");
-                    //   if(text){
-                    //     text.classList.add("target-text");
-                    //     //text.value = reply.join("\n");
-                    //   } 
-                    //   var btn = replyText.querySelector(".post .import-btn");
-                    //   if(btn == null){
-                    //     btn = document.createElement("a");
-                    //     btn.classList.add("import-btn");
-                    //     btn.href="javascript:void 0;"
-                    //     btn.innerHTML="引用跳針紀錄(因技術限制需先在留言框先打一個字才能引用)";
-                    //     btn.onclick = function(e){
-                    //       if(text){
-                    //         text.value += "\n" + this.getAttribute("data-text");
-                    //       }
-                    //       e.preventDefault();
-                    //       e.stopPropagation();
-                    //       return false;
-                    //     };
-                    //     replyText.querySelector(".post").appendChild(btn);
-                    //   }
-                    //   btn.setAttribute("data-text",reply.join("\n"));
-                    //}
                   });
                 });
-
-
+              }
+              if(result.data.check_ids.length){
+                result.data.check_ids.forEach(function(post_id){
+                  var post = document.getElementById(post_id);
+                  var _url = getPostUrl(post,url);
+                  var report = post.querySelector(".comment-report");
+                  var actions = post.querySelector(".ugccmt-comment-meta");
+                  var more = post.querySelector(".ugccmt-commenttext .ugccmt-expand");
+                  if(more != null){
+                    more.click();
+                    setTimeout(function(){
+                      doPost(SERVER+"comment/report_check",
+                      {
+                        data:JSON.stringify(analyticsPost(post,_url,true)) //add-on only
+                      });
+                    },1000);
+                  }else{
+                    doPost(SERVER+"comment/report_check",
+                    {
+                      data:JSON.stringify(analyticsPost(post,_url,true)) //add-on only
+                    });
+                  }
+                });
               }
 
             }
