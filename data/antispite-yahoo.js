@@ -163,6 +163,10 @@ function wrapper() {
       report.href="javascript:void 0;";
       
       var post_id = post.id;
+      var hiddens = post.querySelectorAll(".ugccmt-show-hidden-comment");
+      for(var _ind = 0;_ind < hiddens.length ;++_ind){
+        hiddens[_ind].click();
+      }
       var handler = function(){
         var post = document.querySelector("#"+post_id);
         var report = post.querySelector(".comment-report");
